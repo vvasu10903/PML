@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Vinay Vasudev" />
+
+<meta name="date" content="2014-10-26" />
+
+<title>Analysis of Storm Event Data for Public Health Impact and Economic Consequences</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<link href="data:text/css,body%20%7B%0A%20%20background%2Dcolor%3A%20%23fff%3B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20max%2Dwidth%3A%20700px%3B%0A%20%20overflow%3A%20visible%3B%0A%20%20padding%2Dleft%3A%202em%3B%0A%20%20padding%2Dright%3A%202em%3B%0A%20%20font%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0A%20%20font%2Dsize%3A%2014px%3B%0A%20%20line%2Dheight%3A%201%2E35%3B%0A%7D%0A%0A%23header%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0A%0A%23TOC%20%7B%0A%20%20clear%3A%20both%3B%0A%20%20margin%3A%200%200%2010px%2010px%3B%0A%20%20padding%3A%204px%3B%0A%20%20width%3A%20400px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20border%2Dradius%3A%205px%3B%0A%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20font%2Dsize%3A%2013px%3B%0A%20%20line%2Dheight%3A%201%2E3%3B%0A%7D%0A%20%20%23TOC%20%2Etoctitle%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%20%20font%2Dsize%3A%2015px%3B%0A%20%20%20%20margin%2Dleft%3A%205px%3B%0A%20%20%7D%0A%0A%20%20%23TOC%20ul%20%7B%0A%20%20%20%20padding%2Dleft%3A%2040px%3B%0A%20%20%20%20margin%2Dleft%3A%20%2D1%2E5em%3B%0A%20%20%20%20margin%2Dtop%3A%205px%3B%0A%20%20%20%20margin%2Dbottom%3A%205px%3B%0A%20%20%7D%0A%20%20%23TOC%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dleft%3A%20%2D2em%3B%0A%20%20%7D%0A%20%20%23TOC%20li%20%7B%0A%20%20%20%20line%2Dheight%3A%2016px%3B%0A%20%20%7D%0A%0Atable%20%7B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dcolor%3A%20%23DDDDDD%3B%0A%20%20border%2Dstyle%3A%20outset%3B%0A%20%20border%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0A%20%20border%2Dwidth%3A%202px%3B%0A%20%20padding%3A%205px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%20%20line%2Dheight%3A%2018px%3B%0A%20%20padding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0A%20%20border%2Dleft%2Dstyle%3A%20none%3B%0A%20%20border%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Ap%20%7B%0A%20%20margin%3A%200%2E5em%200%3B%0A%7D%0A%0Ablockquote%20%7B%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20padding%3A%200%2E25em%200%2E75em%3B%0A%7D%0A%0Ahr%20%7B%0A%20%20border%2Dstyle%3A%20solid%3B%0A%20%20border%3A%20none%3B%0A%20%20border%2Dtop%3A%201px%20solid%20%23777%3B%0A%20%20margin%3A%2028px%200%3B%0A%7D%0A%0Adl%20%7B%0A%20%20margin%2Dleft%3A%200%3B%0A%7D%0A%20%20dl%20dd%20%7B%0A%20%20%20%20margin%2Dbottom%3A%2013px%3B%0A%20%20%20%20margin%2Dleft%3A%2013px%3B%0A%20%20%7D%0A%20%20dl%20dt%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%7D%0A%0Aul%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%7D%0A%20%20ul%20li%20%7B%0A%20%20%20%20list%2Dstyle%3A%20circle%20outside%3B%0A%20%20%7D%0A%20%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dbottom%3A%200%3B%0A%20%20%7D%0A%0Apre%2C%20code%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20color%3A%20%23333%3B%0A%7D%0Apre%20%7B%0A%20%20white%2Dspace%3A%20pre%2Dwrap%3B%20%20%20%20%2F%2A%20Wrap%20long%20lines%20%2A%2F%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20margin%3A%205px%200px%2010px%200px%3B%0A%20%20padding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Acode%20%7B%0A%20%20font%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0A%20%20font%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0A%20%20padding%3A%202px%200px%3B%0A%7D%0A%0Adiv%2Efigure%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0A%20%20background%2Dcolor%3A%20%23FFFFFF%3B%0A%20%20padding%3A%202px%3B%0A%20%20border%3A%201px%20solid%20%23DDDDDD%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20margin%3A%200%205px%3B%0A%7D%0A%0Ah1%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%20%20font%2Dsize%3A%2035px%3B%0A%20%20line%2Dheight%3A%2040px%3B%0A%7D%0A%0Ah2%20%7B%0A%20%20border%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20padding%2Dbottom%3A%202px%3B%0A%20%20font%2Dsize%3A%20145%25%3B%0A%7D%0A%0Ah3%20%7B%0A%20%20border%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20font%2Dsize%3A%20120%25%3B%0A%7D%0A%0Ah4%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0A%20%20margin%2Dleft%3A%208px%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Ah5%2C%20h6%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23ccc%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Aa%20%7B%0A%20%20color%3A%20%230033dd%3B%0A%20%20text%2Ddecoration%3A%20none%3B%0A%7D%0A%20%20a%3Ahover%20%7B%0A%20%20%20%20color%3A%20%236666ff%3B%20%7D%0A%20%20a%3Avisited%20%7B%0A%20%20%20%20color%3A%20%23800080%3B%20%7D%0A%20%20a%3Avisited%3Ahover%20%7B%0A%20%20%20%20color%3A%20%23BB00BB%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%0A%2F%2A%20Class%20described%20in%20https%3A%2F%2Fbenjeffrey%2Ecom%2Fposts%2Fpandoc%2Dsyntax%2Dhighlighting%2Dcss%0A%20%20%20Colours%20from%20https%3A%2F%2Fgist%2Egithub%2Ecom%2Frobsimmons%2F1172277%20%2A%2F%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Keyword%20%2A%2F%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%2F%2A%20DataType%20%2A%2F%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%2F%2A%20DecVal%20%28decimal%20values%29%20%2A%2F%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20BaseN%20%2A%2F%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Float%20%2A%2F%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Char%20%2A%2F%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20String%20%2A%2F%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%2F%2A%20Comment%20%2A%2F%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%2F%2A%20OtherToken%20%2A%2F%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20AlertToken%20%2A%2F%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Function%20calls%20%2A%2F%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%2F%2A%20ErrorTok%20%2A%2F%0A%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+<div id="header">
+<h1 class="title">Analysis of Storm Event Data for Public Health Impact and Economic Consequences</h1>
+<h4 class="author"><em>Vinay Vasudev</em></h4>
+<h4 class="date"><em>2014-10-26</em></h4>
+</div>
+
+
+<div id="synopsis" class="section level2">
+<h2>Synopsis</h2>
+<p>The objective for this assignment is to explore a reproducible research analysis using a data set about severe weather events. Data set comes from the U.S. National Oceanic and Atmospheric Administration’s (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.The purpose of this assignment is to load, clean and prapare the data so that the following two questions can be addressed.</p>
+<ul>
+<li><p>Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?</p></li>
+<li><p>Across the United States, which types of events have the greatest economic consequences?</p></li>
+</ul>
+<p>The dataset is very large with almost a million record with the information which has not been coded consistently because of different practices over the last 40-50 years. All this proved to be very challenging in handling and cleaning the data to prepare for answering the above questions.</p>
+</div>
+<div id="data-processing" class="section level2">
+<h2>Data Processing</h2>
+<p>We load the data directly from the source directory which is set in the code and the data is read directly from a zipped file (as downloaded from the course site) of a massive size (902297 observations of 37 variables: about 47 MB). After the data is loaded, we inspect various structural elements of the data set so that strategies can be devised for cleaning and preparation. We observe that the column “EVTYPE” which has detail about the recorded weather events stores the values as factors but because of spelling variations and several different special characters lot of potential duplicate names exist. We find that there are 985 different levels of factors with almost a million records.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;C:/Users/vasudev/Desktop/Data Science Specialization/Reproducible Research/Course Projects/PA_2&quot;</span>)
+<span class="kw">Sys.setlocale</span>(<span class="st">&quot;LC_ALL&quot;</span>,<span class="st">&quot;English&quot;</span>)</code></pre>
+<pre><code>## [1] &quot;LC_COLLATE=English_United States.1252;LC_CTYPE=English_United States.1252;LC_MONETARY=English_United States.1252;LC_NUMERIC=C;LC_TIME=English_United States.1252&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">stormData5Rows &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;repdata-data-StormData.csv.bz2&quot;</span>, <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">nrows =</span> <span class="dv">5</span>)
+classes &lt;-<span class="st"> </span><span class="kw">sapply</span>(stormData5Rows, class)
+stormData &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;repdata-data-StormData.csv.bz2&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,
+    <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">colClasses =</span> classes)</code></pre>
+<pre><code>## Warning: not all columns named in 'colClasses' exist
+## Warning: number of items to replace is not a multiple of replacement length</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(stormData)</code></pre>
+<pre><code>##   STATE__           BGN_DATE BGN_TIME TIME_ZONE COUNTY COUNTYNAME STATE
+## 1    1.00  4/18/1950 0:00:00     0130       CST     97     MOBILE    AL
+## 2    1.00  4/18/1950 0:00:00     0145       CST      3    BALDWIN    AL
+## 3    1.00  2/20/1951 0:00:00     1600       CST     57    FAYETTE    AL
+## 4    1.00   6/8/1951 0:00:00     0900       CST     89    MADISON    AL
+## 5    1.00 11/15/1951 0:00:00     1500       CST     43    CULLMAN    AL
+## 6    1.00 11/15/1951 0:00:00     2000       CST     77 LAUDERDALE    AL
+##    EVTYPE BGN_RANGE BGN_AZI BGN_LOCATI END_DATE END_TIME COUNTY_END
+## 1 TORNADO         0                                               0
+## 2 TORNADO         0                                               0
+## 3 TORNADO         0                                               0
+## 4 TORNADO         0                                               0
+## 5 TORNADO         0                                               0
+## 6 TORNADO         0                                               0
+##   COUNTYENDN END_RANGE END_AZI END_LOCATI LENGTH WIDTH F MAG FATALITIES
+## 1         NA         0                      14.0   100 3   0          0
+## 2         NA         0                       2.0   150 2   0          0
+## 3         NA         0                       0.1   123 2   0          0
+## 4         NA         0                       0.0   100 2   0          0
+## 5         NA         0                       0.0   150 2   0          0
+## 6         NA         0                       1.5   177 2   0          0
+##   INJURIES PROPDMG PROPDMGEXP CROPDMG CROPDMGEXP WFO STATEOFFIC ZONENAMES
+## 1       15    25.0          K       0                                    
+## 2        0     2.5          K       0                                    
+## 3        2    25.0          K       0                                    
+## 4        2     2.5          K       0                                    
+## 5        2     2.5          K       0                                    
+## 6        6     2.5          K       0                                    
+##   LATITUDE LONGITUDE LATITUDE_E LONGITUDE_ REMARKS REFNUM
+## 1     3040      8812       3051       8806              1
+## 2     3042      8755          0          0              2
+## 3     3340      8742          0          0              3
+## 4     3458      8626          0          0              4
+## 5     3412      8642          0          0              5
+## 6     3450      8748          0          0              6</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(stormData)</code></pre>
+<pre><code>## 'data.frame':    902297 obs. of  37 variables:
+##  $ STATE__   : Factor w/ 70 levels &quot;1.00&quot;,&quot;10.00&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ BGN_DATE  : Factor w/ 16335 levels &quot;1/1/1966 0:00:00&quot;,..: 6523 6523 4242 11116 2224 2224 2260 383 3980 3980 ...
+##  $ BGN_TIME  : Factor w/ 3608 levels &quot;00:00:00 AM&quot;,..: 272 287 2705 1683 2584 3186 242 1683 3186 3186 ...
+##  $ TIME_ZONE : Factor w/ 22 levels &quot;ADT&quot;,&quot;AKS&quot;,&quot;AST&quot;,..: 7 7 7 7 7 7 7 7 7 7 ...
+##  $ COUNTY    : num  97 3 57 89 43 77 9 123 125 57 ...
+##  $ COUNTYNAME: Factor w/ 29601 levels &quot;&quot;,&quot;5NM E OF MACKINAC BRIDGE TO PRESQUE ISLE LT MI&quot;,..: 13513 1873 4598 10592 4372 10094 1973 23873 24418 4598 ...
+##  $ STATE     : Factor w/ 72 levels &quot;AK&quot;,&quot;AL&quot;,&quot;AM&quot;,..: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ EVTYPE    : Factor w/ 985 levels &quot;   HIGH SURF ADVISORY&quot;,..: 834 834 834 834 834 834 834 834 834 834 ...
+##  $ BGN_RANGE : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ BGN_AZI   : Factor w/ 35 levels &quot;&quot;,&quot;  N&quot;,&quot; NW&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ BGN_LOCATI: Factor w/ 54429 levels &quot;&quot;,&quot;- 1 N Albion&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ END_DATE  : Factor w/ 6663 levels &quot;&quot;,&quot;1/1/1993 0:00:00&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ END_TIME  : Factor w/ 3647 levels &quot;&quot;,&quot; 0900CST&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ COUNTY_END: num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ COUNTYENDN: logi  NA NA NA NA NA NA ...
+##  $ END_RANGE : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ END_AZI   : Factor w/ 24 levels &quot;&quot;,&quot;E&quot;,&quot;ENE&quot;,&quot;ESE&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ END_LOCATI: Factor w/ 34506 levels &quot;&quot;,&quot;- .5 NNW&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ LENGTH    : num  14 2 0.1 0 0 1.5 1.5 0 3.3 2.3 ...
+##  $ WIDTH     : num  100 150 123 100 150 177 33 33 100 100 ...
+##  $ F         : int  3 2 2 2 2 2 2 1 3 3 ...
+##  $ MAG       : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ FATALITIES: num  0 0 0 0 0 0 0 0 1 0 ...
+##  $ INJURIES  : num  15 0 2 2 2 6 1 0 14 0 ...
+##  $ PROPDMG   : num  25 2.5 25 2.5 2.5 2.5 2.5 2.5 25 25 ...
+##  $ PROPDMGEXP: Factor w/ 19 levels &quot;&quot;,&quot;-&quot;,&quot;?&quot;,&quot;+&quot;,..: 17 17 17 17 17 17 17 17 17 17 ...
+##  $ CROPDMG   : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ CROPDMGEXP: Factor w/ 9 levels &quot;&quot;,&quot;?&quot;,&quot;0&quot;,&quot;2&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ WFO       : Factor w/ 542 levels &quot;&quot;,&quot; CI&quot;,&quot;$AC&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ STATEOFFIC: Factor w/ 250 levels &quot;&quot;,&quot;ALABAMA, Central&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ ZONENAMES : Factor w/ 25112 levels &quot;&quot;,&quot;                                                                                                                               &quot;| __truncated__,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ LATITUDE  : num  3040 3042 3340 3458 3412 ...
+##  $ LONGITUDE : num  8812 8755 8742 8626 8642 ...
+##  $ LATITUDE_E: num  3051 0 0 0 0 ...
+##  $ LONGITUDE_: num  8806 0 0 0 0 ...
+##  $ REMARKS   : Factor w/ 436781 levels &quot;&quot;,&quot;-2 at Deer Park\n&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ REFNUM    : num  1 2 3 4 5 6 7 8 9 10 ...</code></pre>
+<p>After the data is loaded and the initial exploration is complete we create a subset of data set in a new data frame to carry forward only the required elements of data which will help us answer the questions for the assignment. This makes the data easier to load and handle. Number of observations are now reduced to 254633 but the number of factor levels for EVTYPE are still at 985.</p>
+<pre class="sourceCode r"><code class="sourceCode r">stormDataNew &lt;-<span class="st"> </span>stormData[, <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">23</span>:<span class="dv">28</span>)]
+stormDataNew &lt;-stormDataNew[(stormDataNew$PROPDMG &gt;<span class="st"> </span><span class="dv">0</span> |
+<span class="st">    </span>stormDataNew$CROPDMG &gt;<span class="st"> </span><span class="dv">0</span> |<span class="st"> </span>stormDataNew$FATALITIES &gt;<span class="st"> </span><span class="dv">0</span> |
+<span class="st">    </span>stormDataNew$INJURIES &gt;<span class="st"> </span><span class="dv">0</span>), ]</code></pre>
+<p>Now we turn our attention to the column “EVTYPE” which requires significant amount of cleaning and removal duplicates and special characters. We also change all the character strings to lower case. Through this process we are able reduce number of factor levels from 985 to 397 which is a significant reduction. We also create a new column in the data frame “TYPE” which we use for storing the cleaned and standardized weather event labels. For now, we make an exact copy of what is in “EVTYPE” after cleanup.</p>
+<pre class="sourceCode r"><code class="sourceCode r">stormDataNew[, <span class="st">'TYPE'</span>] &lt;-<span class="st"> </span>stormDataNew[, <span class="st">'EVTYPE'</span>]
+stormDataNew$TYPE &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;[[:punct:]]&quot;</span>,<span class="st">&quot; &quot;</span>,stormDataNew$TYPE)
+stormDataNew$TYPE &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;[[:digit:]]&quot;</span>,<span class="st">&quot;&quot;</span>,stormDataNew$TYPE)
+stormDataNew$TYPE &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;(^ +)|( +$)&quot;</span>, <span class="st">&quot;&quot;</span>, stormDataNew$TYPE)
+stormDataNew$TYPE &lt;-<span class="st"> </span><span class="kw">tolower</span>(stormDataNew$TYPE)
+stormDataNew[, <span class="st">'TYPE'</span>] &lt;-<span class="st"> </span><span class="kw">as.factor</span>(stormDataNew[, <span class="st">'TYPE'</span>])</code></pre>
+<p>During the initial exploration we had noticed that some variables in the data set stored exponent values for property damage and crop damage. These values were stored as factors and in many situations had characters which either did not make any sense, could not be identified, or in some cases had to be translated into equivalent number, e.g., K or k in field meant a multiplier by 1000.</p>
+<p>In the following section, we cleaned these fields and also created an additional column “FINDMG” to store the results of calculation to determine the total economic losses because of a severe weather event which essentially is sum total of property and crop damages.</p>
+<pre class="sourceCode r"><code class="sourceCode r">stormDataNew$PROPEXP &lt;-<span class="st"> </span><span class="kw">factor</span>(stormDataNew$PROPDMGEXP)
+<span class="kw">levels</span>(stormDataNew$PROPEXP) &lt;-<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;0&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;-&quot;</span>, <span class="st">&quot;?&quot;</span>, <span class="st">&quot;+&quot;</span>),
+    <span class="st">&quot;100&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;H&quot;</span>, <span class="st">&quot;h&quot;</span>),
+    <span class="st">&quot;1000&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;K&quot;</span>, <span class="st">&quot;k&quot;</span>),
+    <span class="st">&quot;1000000&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;m&quot;</span>),
+    <span class="st">&quot;1000000000&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>, <span class="st">&quot;b&quot;</span>)
+)
+
+stormDataNew$CROPEXP &lt;-<span class="st"> </span><span class="kw">factor</span>(stormDataNew$CROPDMGEXP)
+<span class="kw">levels</span>(stormDataNew$CROPEXP) &lt;-<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;0&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;?&quot;</span>, <span class="st">&quot;0&quot;</span>),
+    <span class="st">&quot;1000&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;K&quot;</span>, <span class="st">&quot;k&quot;</span>),
+    <span class="st">&quot;1000000&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;m&quot;</span>),
+    <span class="st">&quot;1000000000&quot;</span> =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>, <span class="st">&quot;b&quot;</span>)
+)
+
+stormDataNew$PROPEXP &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(stormDataNew$PROPEXP))
+stormDataNew$CROPEXP &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(stormDataNew$CROPEXP))
+
+
+stormDataNew$PROP &lt;-<span class="st"> </span>(stormDataNew$PROPDMG *<span class="st"> </span>stormDataNew$PROPEXP)
+stormDataNew$CROP &lt;-<span class="st"> </span>(stormDataNew$CROPDMG *<span class="st"> </span>stormDataNew$CROPEXP)
+
+stormDataNew$FINDMG &lt;-<span class="st"> </span>(stormDataNew$PROP +<span class="st"> </span>stormDataNew$CROP)</code></pre>
+<p>Finally, we devise a strategy to further clean and reduce the weather event type labels data. We researched and determined that NOAA/NWS (National Weather Service directive 10-1605) has defined 48 categories of severe weather events leading to fatalities, injuries, damage, etc. This also includes significant events, such as tornadoes that have no impact or cause no damage are also included in the Storm Data.</p>
+<p>For the purpose of this analysis, several of the summary reports were considered the duplicated records and were accumulated in “Other” category.</p>
+<p>In the following section, we take event type data stored in the column “TYPE” (about 397 labels) and cross-match them with the 48 categories defined by NOAA/NWS. WIth this detailed cross-matching we are able to bring down the number of labels to 45. There were few labels which didn’t fit the 48 categories so we grouped them together as “Other”. This way we ensure that all the labels are accounted for and there are no column fields with missing values (or NAs).</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">levels</span>(stormDataNew$TYPE) &lt;-<span class="st"> </span><span class="kw">list</span>(
+    <span class="dt">AstronomicalTide =</span> <span class="kw">c</span>(<span class="st">&quot;astronomical high tide&quot;</span>,<span class="st">&quot;astronomical low tide&quot;</span>),
+    <span class="dt">Avalanche =</span> <span class="kw">c</span>(<span class="st">&quot;avalance&quot;</span>, <span class="st">&quot;avalanche&quot;</span>),
+    <span class="dt">Blizzard =</span> <span class="kw">c</span>(<span class="st">&quot;blizzard&quot;</span>,<span class="st">&quot;blizzardwinter storm&quot;</span>,<span class="st">&quot;ground blizzard&quot;</span>),
+    <span class="dt">CoastalFlood =</span> <span class="kw">c</span>(<span class="st">&quot;beach erosion&quot;</span>,<span class="st">&quot;coastal erosion&quot;</span>,<span class="st">&quot;coastal flood&quot;</span>,
+    <span class="st">&quot;coastal flooding&quot;</span>,<span class="st">&quot;coastal floodingerosion&quot;</span>,<span class="st">&quot;erosioncstl flood&quot;</span>,
+    <span class="st">&quot;heavy surf coastal flooding&quot;</span>,<span class="st">&quot;coastal  floodingerosion&quot;</span>),
+    <span class="dt">ColdWindChill =</span> <span class="kw">c</span>(<span class="st">&quot;cold&quot;</span>,<span class="st">&quot;coldwind chill&quot;</span>,<span class="st">&quot;coldwinds&quot;</span>,<span class="st">&quot;cool and wet&quot;</span>,
+    <span class="st">&quot;low temperature&quot;</span>,<span class="st">&quot;unseasonable cold&quot;</span>,<span class="st">&quot;unseasonably cold&quot;</span>),
+    <span class="dt">DenseFog =</span> <span class="kw">c</span>(<span class="st">&quot;dense fog&quot;</span>,<span class="st">&quot;fog&quot;</span>,<span class="st">&quot;fog and cold temperatures&quot;</span>),
+    <span class="dt">DenseSmoke =</span> <span class="kw">c</span>(<span class="st">&quot;dense smoke&quot;</span>),
+    <span class="dt">Drought =</span> <span class="kw">c</span>(<span class="st">&quot;drought&quot;</span>,<span class="st">&quot;droughtexcessive heat&quot;</span>),
+    <span class="dt">DustDevil =</span> <span class="kw">c</span>(<span class="st">&quot;dust devil&quot;</span>,<span class="st">&quot;dust devil waterspout&quot;</span>),
+    <span class="dt">DustStorm =</span> <span class="kw">c</span>(<span class="st">&quot;blowing dust&quot;</span>,<span class="st">&quot;dust storm&quot;</span>,<span class="st">&quot;dust stormhigh winds&quot;</span>),
+    <span class="dt">ExcessiveHeat =</span> <span class="kw">c</span>(<span class="st">&quot;excessive heat&quot;</span>,<span class="st">&quot;extreme heat&quot;</span>,<span class="st">&quot;hypothermia&quot;</span>,
+    <span class="st">&quot;hypothermiaexposure&quot;</span>,<span class="st">&quot;record heat&quot;</span>,<span class="st">&quot;recordexcessive heat&quot;</span>,
+    <span class="st">&quot;unseasonably warm&quot;</span>,<span class="st">&quot;unseasonably warm and dry&quot;</span>,<span class="st">&quot;warm weather&quot;</span>),
+    <span class="dt">ExtremeColdWindChill =</span> <span class="kw">c</span>(<span class="st">&quot;cold air tornado&quot;</span>,<span class="st">&quot;cold and snow&quot;</span>,
+    <span class="st">&quot;cold and wet conditions&quot;</span>,<span class="st">&quot;cold temperature&quot;</span>,<span class="st">&quot;cold wave&quot;</span>,<span class="st">&quot;cold weather&quot;</span>,
+    <span class="st">&quot;extended cold&quot;</span>,<span class="st">&quot;extreme cold&quot;</span>,<span class="st">&quot;extreme coldwind chill&quot;</span>,<span class="st">&quot;extreme wind chill&quot;</span>,
+    <span class="st">&quot;extreme windchill&quot;</span>,<span class="st">&quot;hyperthermiaexposure&quot;</span>,<span class="st">&quot;record cold&quot;</span>),
+    <span class="dt">FlashFlood =</span> <span class="kw">c</span>(<span class="st">&quot;breakup flooding&quot;</span>,<span class="st">&quot;dam break&quot;</span>,<span class="st">&quot;downburst&quot;</span>,<span class="st">&quot;drowning&quot;</span>,
+    <span class="st">&quot;flash flood&quot;</span>,<span class="st">&quot;flash flood  heavy rain&quot;</span>,<span class="st">&quot;flash flood from ice jams&quot;</span>,
+    <span class="st">&quot;flash flood landslides&quot;</span>,<span class="st">&quot;flash flood street&quot;</span>,<span class="st">&quot;flash flood winds&quot;</span>,
+    <span class="st">&quot;flash floodflood&quot;</span>,<span class="st">&quot;flash flooding&quot;</span>,<span class="st">&quot;flash floodingflood&quot;</span>,
+    <span class="st">&quot;flash floodingthunderstorm wi&quot;</span>,<span class="st">&quot;flash floodlandslide&quot;</span>,<span class="st">&quot;flash floods&quot;</span>,
+    <span class="st">&quot;flood  heavy rain&quot;</span>,<span class="st">&quot;flood flash&quot;</span>,<span class="st">&quot;floodflash&quot;</span>,<span class="st">&quot;floodflash flood&quot;</span>,
+    <span class="st">&quot;floodflashflood&quot;</span>,<span class="st">&quot;landslide&quot;</span>,<span class="st">&quot;landslides&quot;</span>,<span class="st">&quot;landslump&quot;</span>,<span class="st">&quot;landspout&quot;</span>,
+    <span class="st">&quot;marine accident&quot;</span>,<span class="st">&quot;marine mishap&quot;</span>,<span class="st">&quot;mud slide&quot;</span>,<span class="st">&quot;mud slides&quot;</span>,
+    <span class="st">&quot;mud slides urban flooding&quot;</span>,<span class="st">&quot;mudslide&quot;</span>,<span class="st">&quot;mudslides&quot;</span>,<span class="st">&quot;rapidly rising water&quot;</span>),
+    <span class="dt">Flood =</span> <span class="kw">c</span>(<span class="st">&quot;flood&quot;</span>,<span class="st">&quot;flooding&quot;</span>,<span class="st">&quot;floodingheavy rain&quot;</span>,<span class="st">&quot;floodrainwinds&quot;</span>,
+    <span class="st">&quot;floodriver flood&quot;</span>,<span class="st">&quot;floods&quot;</span>,<span class="st">&quot;major flood&quot;</span>,<span class="st">&quot;minor flooding&quot;</span>,
+    <span class="st">&quot;river and stream flood&quot;</span>,<span class="st">&quot;river flood&quot;</span>,<span class="st">&quot;river flooding&quot;</span>,<span class="st">&quot;rural flood&quot;</span>,
+    <span class="st">&quot;small stream flood&quot;</span>,<span class="st">&quot;tidal flooding&quot;</span>,<span class="st">&quot;urban and small&quot;</span>,
+    <span class="st">&quot;urban and small stream floodin&quot;</span>,<span class="st">&quot;urban flood&quot;</span>,<span class="st">&quot;urban flooding&quot;</span>,
+    <span class="st">&quot;urban floods&quot;</span>,<span class="st">&quot;urban small&quot;</span>,<span class="st">&quot;urbansmall stream&quot;</span>,<span class="st">&quot;urbansmall stream flood&quot;</span>,
+    <span class="st">&quot;urbansml stream fld&quot;</span>),
+    <span class="dt">FreezingFog =</span> <span class="kw">c</span>(<span class="st">&quot;light freezing rain&quot;</span>),
+    <span class="dt">FrostFreeze =</span> <span class="kw">c</span>(<span class="st">&quot;agricultural freeze&quot;</span>,<span class="st">&quot;black ice&quot;</span>,<span class="st">&quot;damaging freeze&quot;</span>,
+    <span class="st">&quot;early frost&quot;</span>,<span class="st">&quot;falling snowice&quot;</span>,<span class="st">&quot;freeze&quot;</span>,<span class="st">&quot;freezing drizzle&quot;</span>,<span class="st">&quot;freezing fog&quot;</span>,
+    <span class="st">&quot;freezing rain&quot;</span>,<span class="st">&quot;freezing rainsleet&quot;</span>,<span class="st">&quot;freezing rainsnow&quot;</span>,<span class="st">&quot;freezing spray&quot;</span>,
+    <span class="st">&quot;frost&quot;</span>,<span class="st">&quot;frostfreeze&quot;</span>,<span class="st">&quot;glaze&quot;</span>,<span class="st">&quot;glaze ice&quot;</span>,<span class="st">&quot;hard freeze&quot;</span>,<span class="st">&quot;light snow&quot;</span>,
+    <span class="st">&quot;light snowfall&quot;</span>),
+    <span class="dt">FunnelCloud =</span> <span class="kw">c</span>(<span class="st">&quot;funnel cloud&quot;</span>),
+    <span class="dt">Hail =</span> <span class="kw">c</span>(<span class="st">&quot;hail&quot;</span>,<span class="st">&quot;hail&quot;</span>,<span class="st">&quot;hail damage&quot;</span>,<span class="st">&quot;hailstorm&quot;</span>,<span class="st">&quot;hailwind&quot;</span>,<span class="st">&quot;hailwinds&quot;</span>),
+    <span class="dt">Heat =</span> <span class="kw">c</span>(<span class="st">&quot;heat&quot;</span>,<span class="st">&quot;heat wave&quot;</span>,<span class="st">&quot;heat wave drought&quot;</span>,<span class="st">&quot;heat waves&quot;</span>),
+    <span class="dt">HeavyRain =</span> <span class="kw">c</span>(<span class="st">&quot;excessive rainfall&quot;</span>,<span class="st">&quot;excessive wetness&quot;</span>,<span class="st">&quot;heavy rain&quot;</span>,
+    <span class="st">&quot;heavy rain and flood&quot;</span>,<span class="st">&quot;heavy rainhigh surf&quot;</span>,<span class="st">&quot;heavy rainlightning&quot;</span>,
+    <span class="st">&quot;heavy rains&quot;</span>,<span class="st">&quot;heavy rainsevere weather&quot;</span>,<span class="st">&quot;heavy rainsflooding&quot;</span>,
+    <span class="st">&quot;heavy rainsmall stream urban&quot;</span>,<span class="st">&quot;heavy rainsnow&quot;</span>,<span class="st">&quot;heavy shower&quot;</span>,<span class="st">&quot;hvy rain&quot;</span>,
+    <span class="st">&quot;rain&quot;</span>,<span class="st">&quot;rainsnow&quot;</span>,<span class="st">&quot;rainstorm&quot;</span>,<span class="st">&quot;rainwind&quot;</span>,<span class="st">&quot;record rainfall&quot;</span>,
+    <span class="st">&quot;torrential rainfall&quot;</span>,<span class="st">&quot;unseasonal rain&quot;</span>),
+    <span class="dt">HeavySnow =</span> <span class="kw">c</span>(<span class="st">&quot;blowing snow&quot;</span>,<span class="st">&quot;excessive snow&quot;</span>,<span class="st">&quot;heavy mix&quot;</span>,
+    <span class="st">&quot;heavy precipitation&quot;</span>,<span class="st">&quot;heavy snow&quot;</span>,<span class="st">&quot;heavy snow and high winds&quot;</span>,
+    <span class="st">&quot;heavy snow and strong winds&quot;</span>,<span class="st">&quot;heavy snow shower&quot;</span>,<span class="st">&quot;heavy snow squalls&quot;</span>,
+    <span class="st">&quot;heavy snowblizzard&quot;</span>,<span class="st">&quot;heavy snowblizzardavalanche&quot;</span>,<span class="st">&quot;heavy snowfreezing rain&quot;</span>,
+    <span class="st">&quot;heavy snowhigh winds  flood&quot;</span>,<span class="st">&quot;heavy snowice&quot;</span>,<span class="st">&quot;heavy snowpack&quot;</span>,
+    <span class="st">&quot;heavy snowsqualls&quot;</span>,<span class="st">&quot;heavy snowwind&quot;</span>,<span class="st">&quot;heavy snowwinter storm&quot;</span>,
+    <span class="st">&quot;late season snow&quot;</span>,<span class="st">&quot;mixed precip&quot;</span>,<span class="st">&quot;mixed precipitation&quot;</span>,<span class="st">&quot;record snow&quot;</span>,
+    <span class="st">&quot;rock slide&quot;</span>,<span class="st">&quot;snow&quot;</span>,<span class="st">&quot;snow accumulation&quot;</span>,<span class="st">&quot;snow and heavy snow&quot;</span>,<span class="st">&quot;snow and ice&quot;</span>,
+    <span class="st">&quot;snow and ice storm&quot;</span>,<span class="st">&quot;snow bitter cold&quot;</span>,<span class="st">&quot;snow freezing rain&quot;</span>,<span class="st">&quot;snow ice&quot;</span>,
+    <span class="st">&quot;snow squall&quot;</span>,<span class="st">&quot;snow squalls&quot;</span>,<span class="st">&quot;snowblowing snow&quot;</span>,<span class="st">&quot;snowcold&quot;</span>,
+    <span class="st">&quot;snowfreezing rain&quot;</span>,<span class="st">&quot;snowheavy snow&quot;</span>,<span class="st">&quot;snowhigh winds&quot;</span>,<span class="st">&quot;snowice&quot;</span>,
+    <span class="st">&quot;snowice storm&quot;</span>,<span class="st">&quot;snowmelt flooding&quot;</span>,<span class="st">&quot;snowsleet&quot;</span>,<span class="st">&quot;snowsleetfreezing rain&quot;</span>,
+    <span class="st">&quot;thundersnow&quot;</span>),
+    <span class="dt">HighSurf =</span> <span class="kw">c</span>(<span class="st">&quot;hazardous surf&quot;</span>),
+    <span class="dt">HighWind =</span> <span class="kw">c</span>(<span class="st">&quot;dry microburst&quot;</span>,<span class="st">&quot;dry mircoburst winds&quot;</span>,<span class="st">&quot;microburst&quot;</span>,
+    <span class="st">&quot;microburst winds&quot;</span>,<span class="st">&quot;nonsevere wind damage&quot;</span>),
+    <span class="dt">HurricaneTyphoon =</span> <span class="kw">c</span>(<span class="st">&quot;hurricane&quot;</span>,<span class="st">&quot;hurricane edouard&quot;</span>,<span class="st">&quot;hurricane emily&quot;</span>,
+    <span class="st">&quot;hurricane erin&quot;</span>,<span class="st">&quot;hurricane felix&quot;</span>,<span class="st">&quot;hurricane gordon&quot;</span>,<span class="st">&quot;hurricane opal&quot;</span>,
+    <span class="st">&quot;hurricane opalhigh winds&quot;</span>,<span class="st">&quot;hurricanegenerated swells&quot;</span>,<span class="st">&quot;hurricanetyphoon&quot;</span>,
+    <span class="st">&quot;typhoon&quot;</span>),
+    <span class="dt">IceStorm =</span> <span class="kw">c</span>(<span class="st">&quot;glazeice storm&quot;</span>,<span class="st">&quot;ice&quot;</span>,<span class="st">&quot;ice and snow&quot;</span>,<span class="st">&quot;ice floes&quot;</span>,<span class="st">&quot;ice jam&quot;</span>,
+    <span class="st">&quot;ice jam flood minor&quot;</span>,<span class="st">&quot;ice jam flooding&quot;</span>,<span class="st">&quot;ice on road&quot;</span>,<span class="st">&quot;ice roads&quot;</span>,
+    <span class="st">&quot;ice storm&quot;</span>,<span class="st">&quot;ice stormflash flood&quot;</span>,<span class="st">&quot;icestrong winds&quot;</span>,<span class="st">&quot;icy roads&quot;</span>),
+    <span class="dt">LakeEffectSnow =</span> <span class="kw">c</span>(<span class="st">&quot;heavy lake snow&quot;</span>,<span class="st">&quot;lake effect snow&quot;</span>,<span class="st">&quot;lakeeffect snow&quot;</span>),
+    <span class="dt">LakeshoreFlood =</span> <span class="kw">c</span>(<span class="st">&quot;lake flood&quot;</span>,<span class="st">&quot;lakeshore flood&quot;</span>),
+    <span class="dt">Lightning =</span> <span class="kw">c</span>(<span class="st">&quot;lighting&quot;</span>,<span class="st">&quot;lightning&quot;</span>,<span class="st">&quot;lightning  wauseon&quot;</span>,
+    <span class="st">&quot;lightning and heavy rain&quot;</span>, <span class="st">&quot;lightning and thunderstorm win&quot;</span>,<span class="st">&quot;lightning fire&quot;</span>,
+    <span class="st">&quot;lightning injury&quot;</span>,<span class="st">&quot;lightning thunderstorm winds&quot;</span>,<span class="st">&quot;lightningheavy rain&quot;</span>,
+    <span class="st">&quot;ligntning&quot;</span>),
+    <span class="dt">MarineHail =</span> <span class="kw">c</span>(<span class="st">&quot;marine hail&quot;</span>),
+    <span class="dt">MarineHighWind =</span> <span class="kw">c</span>(<span class="st">&quot;heavy seas&quot;</span>,<span class="st">&quot;heavy surf&quot;</span>,<span class="st">&quot;heavy surf and wind&quot;</span>,
+    <span class="st">&quot;heavy surfhigh surf&quot;</span>,<span class="st">&quot;heavy swells&quot;</span>,<span class="st">&quot;marine high wind&quot;</span>,<span class="st">&quot;marine tstm wind&quot;</span>),
+    <span class="dt">MarineThunderstormWind =</span> <span class="kw">c</span>(<span class="st">&quot;marine strong wind&quot;</span>,<span class="st">&quot;marine thunderstorm wind&quot;</span>),
+    <span class="dt">RipCurrent =</span> <span class="kw">c</span>(<span class="st">&quot;rip current&quot;</span>,<span class="st">&quot;rip currents&quot;</span>,<span class="st">&quot;rip currentsheavy surf&quot;</span>),
+    <span class="dt">Seiche =</span> <span class="kw">c</span>(<span class="st">&quot;seiche&quot;</span>),
+    <span class="dt">Sleet =</span> <span class="kw">c</span>(<span class="st">&quot;sleet&quot;</span>,<span class="st">&quot;sleetice storm&quot;</span>,<span class="st">&quot;small hail&quot;</span>),
+    <span class="dt">StormSurgeTide =</span> <span class="kw">c</span>(<span class="st">&quot;coastal storm&quot;</span>,<span class="st">&quot;coastal surge&quot;</span>,<span class="st">&quot;coastalstorm&quot;</span>,<span class="st">&quot;high seas&quot;</span>,
+    <span class="st">&quot;high surf&quot;</span>,<span class="st">&quot;high surf advisory&quot;</span>,<span class="st">&quot;high swells&quot;</span>,<span class="st">&quot;high tides&quot;</span>,<span class="st">&quot;high water&quot;</span>,
+    <span class="st">&quot;high waves&quot;</span>,<span class="st">&quot;rogue wave&quot;</span>,<span class="st">&quot;rough seas&quot;</span>,<span class="st">&quot;rough surf&quot;</span>,<span class="st">&quot;storm force winds&quot;</span>,
+    <span class="st">&quot;storm surge&quot;</span>,<span class="st">&quot;storm surgetide&quot;</span>),
+    <span class="dt">StrongWind =</span> <span class="kw">c</span>(<span class="st">&quot;gradient wind&quot;</span>,<span class="st">&quot;gusty wind&quot;</span>,<span class="st">&quot;gusty windhail&quot;</span>,
+    <span class="st">&quot;gusty windhvy rain&quot;</span>,<span class="st">&quot;gusty windrain&quot;</span>,<span class="st">&quot;gusty winds&quot;</span>,<span class="st">&quot;high&quot;</span>,<span class="st">&quot;high  winds&quot;</span>,
+    <span class="st">&quot;high wind&quot;</span>,<span class="st">&quot;high wind&quot;</span>,<span class="st">&quot;high wind and seas&quot;</span>,<span class="st">&quot;high wind damage&quot;</span>,<span class="st">&quot;high wind g&quot;</span>,
+    <span class="st">&quot;high windblizzard&quot;</span>,<span class="st">&quot;high windheavy snow&quot;</span>,<span class="st">&quot;high winds&quot;</span>,
+    <span class="st">&quot;high winds heavy rains&quot;</span>,<span class="st">&quot;high windscoastal flood&quot;</span>,<span class="st">&quot;high windscold&quot;</span>,
+    <span class="st">&quot;high windseas&quot;</span>,<span class="st">&quot;high windsheavy rain&quot;</span>,<span class="st">&quot;high windssnow&quot;</span>,<span class="st">&quot;non tstm wind&quot;</span>,
+    <span class="st">&quot;nontstm wind&quot;</span>,<span class="st">&quot;severe turbulence&quot;</span>,<span class="st">&quot;strong wind&quot;</span>,<span class="st">&quot;strong winds&quot;</span>,
+    <span class="st">&quot;wet microburst&quot;</span>,<span class="st">&quot;whirlwind&quot;</span>,<span class="st">&quot;wind&quot;</span>,<span class="st">&quot;wind and wave&quot;</span>,<span class="st">&quot;wind damage&quot;</span>,
+    <span class="st">&quot;wind storm&quot;</span>,<span class="st">&quot;windhail&quot;</span>,<span class="st">&quot;winds&quot;</span>),
+    <span class="dt">ThunderstormWind =</span> <span class="kw">c</span>(<span class="st">&quot;severe thunderstorm&quot;</span>,<span class="st">&quot;severe thunderstorm winds&quot;</span>,
+    <span class="st">&quot;severe thunderstorms&quot;</span>,<span class="st">&quot;thuderstorm winds&quot;</span>,<span class="st">&quot;thundeerstorm winds&quot;</span>,
+    <span class="st">&quot;thunderestorm winds&quot;</span>,<span class="st">&quot;thunderstorm&quot;</span>,<span class="st">&quot;thunderstorm  winds&quot;</span>,
+    <span class="st">&quot;thunderstorm damage to&quot;</span>,<span class="st">&quot;thunderstorm hail&quot;</span>,<span class="st">&quot;thunderstorm wind&quot;</span>,
+    <span class="st">&quot;thunderstorm wind  mph&quot;</span>,<span class="st">&quot;thunderstorm wind g&quot;</span>,<span class="st">&quot;thunderstorm wind mph&quot;</span>,
+    <span class="st">&quot;thunderstorm wind tree&quot;</span>,<span class="st">&quot;thunderstorm wind trees&quot;</span>,<span class="st">&quot;thunderstorm windawning&quot;</span>,
+    <span class="st">&quot;thunderstorm windhail&quot;</span>,<span class="st">&quot;thunderstorm windlightning&quot;</span>,<span class="st">&quot;thunderstorm winds&quot;</span>,
+    <span class="st">&quot;thunderstorm winds&quot;</span>,<span class="st">&quot;thunderstorm winds  mph&quot;</span>,<span class="st">&quot;thunderstorm winds and&quot;</span>,
+    <span class="st">&quot;thunderstorm winds flood&quot;</span>,<span class="st">&quot;thunderstorm winds g&quot;</span>,<span class="st">&quot;thunderstorm winds hail&quot;</span>,
+    <span class="st">&quot;thunderstorm winds lightning&quot;</span>,<span class="st">&quot;thunderstorm windsflooding&quot;</span>,<span class="st">&quot;thunderstorm&quot;</span>,
+    <span class="st">&quot; windsfunnel clou&quot;</span>,<span class="st">&quot;thunderstorm windshail&quot;</span>,<span class="st">&quot;thunderstorm windss&quot;</span>,
+    <span class="st">&quot;thunderstorm wins&quot;</span>,<span class="st">&quot;thunderstorms&quot;</span>,<span class="st">&quot;thunderstorms wind&quot;</span>,
+    <span class="st">&quot;thunderstorms winds&quot;</span>,<span class="st">&quot;thunderstormw&quot;</span>,<span class="st">&quot;thunderstormwinds&quot;</span>,<span class="st">&quot;thunderstrom wind&quot;</span>,
+    <span class="st">&quot;thundertorm winds&quot;</span>,<span class="st">&quot;thunerstorm winds&quot;</span>,<span class="st">&quot;tunderstorm wind&quot;</span>), 
+    <span class="dt">Tornado =</span> <span class="kw">c</span>(<span class="st">&quot;gustnado&quot;</span>,<span class="st">&quot;tornado&quot;</span>,<span class="st">&quot;tornado f&quot;</span>,<span class="st">&quot;tornadoes&quot;</span>,
+    <span class="st">&quot;tornadoes tstm wind hail&quot;</span>,<span class="st">&quot;torndao&quot;</span>),
+    <span class="dt">TropicalDepression =</span> <span class="kw">c</span>(<span class="st">&quot;tropical depression&quot;</span>,<span class="st">&quot;tropical storm&quot;</span>,
+    <span class="st">&quot;tropical storm alberto&quot;</span>,<span class="st">&quot;tropical storm dean&quot;</span>,<span class="st">&quot;tropical storm gordon&quot;</span>,
+    <span class="st">&quot;tropical storm jerry&quot;</span>),
+    <span class="dt">Tsunami =</span> <span class="kw">c</span>(<span class="st">&quot;tstm wind&quot;</span>,<span class="st">&quot;tstm wind&quot;</span>,<span class="st">&quot;tstm wind  g&quot;</span>,<span class="st">&quot;tstm wind and lightning&quot;</span>,
+    <span class="st">&quot;tstm wind damage&quot;</span>,<span class="st">&quot;tstm wind g&quot;</span>,<span class="st">&quot;tstm windhail&quot;</span>,<span class="st">&quot;tstm winds&quot;</span>,<span class="st">&quot;tstmw&quot;</span>,
+    <span class="st">&quot;tsunami&quot;</span>),
+    <span class="dt">VolcanicAsh =</span> <span class="kw">c</span>(<span class="st">&quot;volcanic ash&quot;</span>),
+    <span class="dt">Waterspout =</span> <span class="kw">c</span>(<span class="st">&quot;waterspout&quot;</span>,<span class="st">&quot;waterspout tornado&quot;</span>,<span class="st">&quot;waterspouttornado&quot;</span>),
+    <span class="dt">Wildfire =</span> <span class="kw">c</span>(<span class="st">&quot;brush fire&quot;</span>,<span class="st">&quot;forest fires&quot;</span>,<span class="st">&quot;grass fires&quot;</span>,<span class="st">&quot;wild fires&quot;</span>,
+    <span class="st">&quot;wildfire&quot;</span>,<span class="st">&quot;wildfires&quot;</span>,<span class="st">&quot;wildforest fire&quot;</span>,<span class="st">&quot;wildforest fires&quot;</span>),
+    <span class="dt">WinterStorm =</span> <span class="kw">c</span>(<span class="st">&quot;winter storm&quot;</span>,<span class="st">&quot;winter storm high winds&quot;</span>,<span class="st">&quot;winter storms&quot;</span>),
+    <span class="dt">WinterWeather =</span> <span class="kw">c</span>(<span class="st">&quot;winter weather&quot;</span>,<span class="st">&quot;winter weather mix&quot;</span>,<span class="st">&quot;winter weathermix&quot;</span>,
+    <span class="st">&quot;wintry mix&quot;</span>),
+    <span class="dt">Other =</span> <span class="kw">c</span>(<span class="st">&quot;apache county&quot;</span>,<span class="st">&quot;other&quot;</span>)
+)
+
+stormDataNew$TYPE[<span class="kw">is.na</span>(stormDataNew$TYPE)] &lt;-<span class="st"> </span><span class="kw">as.factor</span>(<span class="st">&quot;Other&quot;</span>)</code></pre>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<p>Results from this analysis were aggregated by the event type into different category to answer the two questions which were asked in this assignment. We aggregated the injuries and fatalities for each event type to answer the question of population health impact. Similarly, property damage and crop damage data was aggregated by event type to answer the question of economic impact.</p>
+<p>Below the results are aggregated into different files and merged together to answer each question.</p>
+<pre class="sourceCode r"><code class="sourceCode r">HealthImpact.Fatalities &lt;-<span class="st"> </span><span class="kw">aggregate</span>(FATALITIES ~<span class="st"> </span>TYPE, <span class="dt">data=</span>stormDataNew, <span class="dt">FUN=</span>sum) 
+HealthImpact.Injuries &lt;-<span class="st"> </span><span class="kw">aggregate</span>(INJURIES ~<span class="st"> </span>TYPE, <span class="dt">data=</span>stormDataNew,<span class="dt">FUN=</span>sum) 
+FinanceDamage.Crop &lt;-<span class="st"> </span><span class="kw">aggregate</span>(CROP ~<span class="st"> </span>TYPE, <span class="dt">data=</span>stormDataNew, <span class="dt">FUN=</span>sum) 
+FinanceDamage.Prop &lt;-<span class="st"> </span><span class="kw">aggregate</span>(PROP ~<span class="st"> </span>TYPE, <span class="dt">data=</span>stormDataNew, <span class="dt">FUN=</span>sum) 
+FinanceDamage.Total &lt;-<span class="st"> </span><span class="kw">aggregate</span>(FINDMG ~<span class="st"> </span>TYPE, <span class="dt">data=</span>stormDataNew, <span class="dt">FUN=</span>sum)
+
+HealthImpact &lt;-<span class="st"> </span><span class="kw">merge</span>(HealthImpact.Fatalities, HealthImpact.Injuries, <span class="dt">by =</span> <span class="st">&quot;TYPE&quot;</span>)
+<span class="kw">colnames</span>(HealthImpact)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Event_Type&quot;</span>
+<span class="kw">colnames</span>(HealthImpact)[<span class="dv">2</span>] &lt;-<span class="st"> &quot;Fatalities&quot;</span>
+<span class="kw">colnames</span>(HealthImpact)[<span class="dv">3</span>] &lt;-<span class="st"> &quot;Injuries&quot;</span>
+
+FinanceDamage1 &lt;-<span class="st"> </span><span class="kw">merge</span>(FinanceDamage.Prop, FinanceDamage.Crop, <span class="dt">by =</span> <span class="st">&quot;TYPE&quot;</span>)
+FinanceDamage &lt;-<span class="st"> </span><span class="kw">merge</span>(FinanceDamage1, FinanceDamage.Total, <span class="dt">by =</span> <span class="st">&quot;TYPE&quot;</span>)
+<span class="kw">colnames</span>(FinanceDamage)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Event_Type&quot;</span>
+<span class="kw">colnames</span>(FinanceDamage)[<span class="dv">2</span>] &lt;-<span class="st"> &quot;Property&quot;</span>
+<span class="kw">colnames</span>(FinanceDamage)[<span class="dv">3</span>] &lt;-<span class="st"> &quot;Crop&quot;</span>
+<span class="kw">colnames</span>(FinanceDamage)[<span class="dv">4</span>] &lt;-<span class="st"> &quot;Total&quot;</span></code></pre>
+<p>We also sort the data so that we can display as well as plot the top ten event types causing the most fatalities, injuries, property damage, crop damage, total property and crop damage, etc.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(xtable)
+<span class="kw">library</span>(plyr)
+<span class="kw">library</span>(knitr)
+
+FinanceDamage.Sorted &lt;-<span class="st"> </span><span class="kw">arrange</span>(FinanceDamage, <span class="kw">desc</span>(Total), <span class="kw">desc</span>(Property), <span class="kw">desc</span>(Crop))
+
+HealthImpact.Sorted &lt;-<span class="st"> </span><span class="kw">arrange</span>(HealthImpact, <span class="kw">desc</span>(Fatalities), <span class="kw">desc</span>(Injuries))
+
+<span class="kw">kable</span>(FinanceDamage.Sorted[<span class="dv">1</span>:<span class="dv">10</span>, ], <span class="dt">format =</span> <span class="st">&quot;html&quot;</span>, <span class="dt">digits =</span> <span class="dv">10</span>)</code></pre>
+<table>
+ <thead>
+  <tr>
+   <th align="left"> 
+Event_Type
+</th>
+   <th align="right"> 
+Property
+</th>
+   <th align="right"> 
+Crop
+</th>
+   <th align="right"> 
+Total
+</th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td align="left"> 
+Flood
+</td>
+   <td align="right"> 
+7.564e+09
+</td>
+   <td align="right"> 
+1.373e+09
+</td>
+   <td align="right"> 
+1.610e+11
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+HurricaneTyphoon
+</td>
+   <td align="right"> 
+1.814e+10
+</td>
+   <td align="right"> 
+1.066e+09
+</td>
+   <td align="right"> 
+9.087e+10
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+Tornado
+</td>
+   <td align="right"> 
+8.511e+09
+</td>
+   <td align="right"> 
+9.112e+07
+</td>
+   <td align="right"> 
+5.896e+10
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+StormSurgeTide
+</td>
+   <td align="right"> 
+3.060e+09
+</td>
+   <td align="right"> 
+1.330e+05
+</td>
+   <td align="right"> 
+4.806e+10
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+Hail
+</td>
+   <td align="right"> 
+1.893e+09
+</td>
+   <td align="right"> 
+5.791e+08
+</td>
+   <td align="right"> 
+1.897e+10
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+FlashFlood
+</td>
+   <td align="right"> 
+2.624e+09
+</td>
+   <td align="right"> 
+1.988e+08
+</td>
+   <td align="right"> 
+1.880e+10
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+Drought
+</td>
+   <td align="right"> 
+2.912e+07
+</td>
+   <td align="right"> 
+2.142e+09
+</td>
+   <td align="right"> 
+1.502e+10
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+IceStorm
+</td>
+   <td align="right"> 
+1.606e+08
+</td>
+   <td align="right"> 
+1.005e+09
+</td>
+   <td align="right"> 
+8.999e+09
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+Wildfire
+</td>
+   <td align="right"> 
+2.228e+09
+</td>
+   <td align="right"> 
+2.964e+07
+</td>
+   <td align="right"> 
+8.900e+09
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+TropicalDepression
+</td>
+   <td align="right"> 
+1.110e+09
+</td>
+   <td align="right"> 
+3.225e+07
+</td>
+   <td align="right"> 
+8.411e+09
+</td>
+  </tr>
+</tbody>
+</table>
+
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kable</span>(HealthImpact.Sorted[<span class="dv">1</span>:<span class="dv">10</span>, ], <span class="dt">format =</span> <span class="st">&quot;html&quot;</span>, <span class="dt">digits =</span> <span class="dv">10</span>)</code></pre>
+<table>
+ <thead>
+  <tr>
+   <th align="left"> 
+Event_Type
+</th>
+   <th align="right"> 
+Fatalities
+</th>
+   <th align="right"> 
+Injuries
+</th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td align="left"> 
+Tornado
+</td>
+   <td align="right"> 
+5658
+</td>
+   <td align="right"> 
+91364
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+ExcessiveHeat
+</td>
+   <td align="right"> 
+2066
+</td>
+   <td align="right"> 
+6749
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+Heat
+</td>
+   <td align="right"> 
+1118
+</td>
+   <td align="right"> 
+2494
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+FlashFlood
+</td>
+   <td align="right"> 
+1090
+</td>
+   <td align="right"> 
+1862
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+Lightning
+</td>
+   <td align="right"> 
+817
+</td>
+   <td align="right"> 
+5232
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+RipCurrent
+</td>
+   <td align="right"> 
+577
+</td>
+   <td align="right"> 
+529
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+Tsunami
+</td>
+   <td align="right"> 
+543
+</td>
+   <td align="right"> 
+7185
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+Flood
+</td>
+   <td align="right"> 
+511
+</td>
+   <td align="right"> 
+6874
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+StrongWind
+</td>
+   <td align="right"> 
+435
+</td>
+   <td align="right"> 
+1872
+</td>
+  </tr>
+  <tr>
+   <td align="left"> 
+ExtremeColdWindChill
+</td>
+   <td align="right"> 
+331
+</td>
+   <td align="right"> 
+260
+</td>
+  </tr>
+</tbody>
+</table>
+
+<p>Below we plot the processed data for population health impact.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfcol =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">barplot</span>(HealthImpact.Sorted$Fatalities[<span class="dv">1</span>:<span class="dv">10</span>],
+    <span class="dt">names.arg=</span>HealthImpact.Sorted$Event_Type[<span class="dv">1</span>:<span class="dv">10</span>],
+    <span class="dt">main=</span><span class="st">&quot;Fatalities per Event Type&quot;</span>, <span class="dt">space=</span><span class="fl">0.2</span>, <span class="dt">cex.axis=</span><span class="fl">0.8</span>, <span class="dt">las=</span><span class="dv">2</span>)
+
+<span class="kw">barplot</span>(HealthImpact.Sorted$Injuries[<span class="dv">1</span>:<span class="dv">10</span>],
+    <span class="dt">names.arg=</span>HealthImpact.Sorted$Event_Type[<span class="dv">1</span>:<span class="dv">10</span>],
+    <span class="dt">main=</span><span class="st">&quot;Injuries per Event Type&quot;</span>, <span class="dt">space=</span><span class="fl">0.2</span>, <span class="dt">cex.axis=</span><span class="fl">0.8</span>, <span class="dt">las=</span><span class="dv">2</span>)</code></pre>
+<p><img src="data:image/png;base64,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" alt="plot of chunk resultsplots1" /></p>
+<p>Below we plot the process data for total property and crop damages.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfcol =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))
+<span class="kw">barplot</span>(FinanceDamage.Sorted$Total[<span class="dv">1</span>:<span class="dv">10</span>],
+    <span class="dt">names.arg=</span>FinanceDamage.Sorted$Event_Type[<span class="dv">1</span>:<span class="dv">10</span>],
+    <span class="dt">main=</span><span class="st">&quot;Total Economic Damage per Event Type&quot;</span>, <span class="dt">space=</span><span class="fl">0.2</span>, <span class="dt">cex.axis=</span><span class="fl">0.8</span>, <span class="dt">las=</span><span class="dv">2</span>)</code></pre>
+<p><img src="data:image/png;base64,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" alt="plot of chunk resultsplots2" /></p>
+<p>We found that <strong>tornadoes</strong> have the most serious impact on population health in the terms of both fatalities and injuries. <strong>Floods</strong> cause the most total economic damage including the property and crop damage followed by <strong>hurricanes/typhoons</strong> and <strong>tornadoes</strong>. <strong>Droughts</strong> have the most serious economic impact because of the crop damage while <strong>floods</strong> has the most economic impact due to damage to property.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
